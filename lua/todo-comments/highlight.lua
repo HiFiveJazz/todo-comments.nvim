@@ -279,15 +279,18 @@ end
           add_highlight(buf, Config.ns, hl_bg, lnum, 0, start)
         end
 
+        local comment_start = line_comment_range(buf, line)
+        local keyword_start = comment_start and comment_start - 1 or start
+
         -- tag highlights
         if hl.keyword == "wide" or hl.keyword == "wide_bg" then
-          add_highlight(buf, Config.ns, hl_bg, lnum, math.max(start - 1, 0), finish + 1)
+          add_highlight(buf, Config.ns, hl_bg, lnum, keyword_start, finish + 1)
         elseif hl.keyword == "wide_fg" then
-          add_highlight(buf, Config.ns, hl_fg, lnum, math.max(start - 1, 0), finish + 1)
+          add_highlight(buf, Config.ns, hl_fg, lnum, keyword_start, finish + 1)
         elseif hl.keyword == "bg" then
-          add_highlight(buf, Config.ns, hl_bg, lnum, start, finish)
+          add_highlight(buf, Config.ns, hl_bg, lnum, keyword_start, finish)
         elseif hl.keyword == "fg" then
-          add_highlight(buf, Config.ns, hl_fg, lnum, start, finish)
+          add_highlight(buf, Config.ns, hl_fg, lnum, keyword_start, finish)
         end
       end
 
