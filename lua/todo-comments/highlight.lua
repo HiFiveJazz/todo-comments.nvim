@@ -165,6 +165,27 @@ function M._update()
   end
 end
 
+local function escape_lua_pattern(s)
+  return (s:gsub("([^%w])", "%%%1"))
+end
+
+local function line_comment_range(buf, line)
+  local ft = vim.bo[buf].commentstring
+  local prefix = ft:match("^(.-)%%s")
+
+  if not prefix or prefix == "" then
+    return
+  end
+
+  prefix = vim.trim(prefix)
+
+  if prefix == "" then
+    return
+  end
+
+  return line:find("^%s*" .. escape_lua_pattern(prefix))
+end
+
 -- highlights the range for the given buf
 function M.highlight(buf, first, last, _event)
   if not vim.api.nvim_buf_is_valid(buf) then
@@ -218,7 +239,8 @@ function M.highlight(buf, first, last, _event)
     --   end
     -- end
 if not kw and last_match and Config.options.highlight.multiline then
-  local comment_start, comment_end = line:find("^%s*%-%-")
+  local comment_start, comment_end = line_comment_range(buf, line)
+
   if
     comment_start
     and M.is_comment(buf, lnum, comment_end - 1)
