@@ -226,7 +226,7 @@ if not kw and last_match and Config.options.highlight.multiline then
   then
     kw = last_match.kw
     start = comment_start
-    finish = #line + 1
+    finish = comment_start
     is_multiline = true
   else
     last_match = nil
