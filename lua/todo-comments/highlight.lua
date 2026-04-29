@@ -279,19 +279,23 @@ end
           add_highlight(buf, Config.ns, hl_bg, lnum, 0, start)
         end
 
-        local _, comment_end = line_comment_range(buf, line)
-        local comment_prefix_start = line:find("%S") -- first non-whitespace char
-        local keyword_start = comment_prefix_start and comment_prefix_start - 1 or start
+        local comment_start, comment_end = line_comment_range(buf, line)
+        if comment_start and comment_end and comment_end < start then
+          local prefix_start = line:find("%S")
+          if prefix_start then
+            add_highlight(buf, Config.ns, hl_fg, lnum, prefix_start - 1, comment_end)
+          end
+        end
 
         -- tag highlights
         if hl.keyword == "wide" or hl.keyword == "wide_bg" then
-          add_highlight(buf, Config.ns, hl_bg, lnum, keyword_start, finish + 1)
+          add_highlight(buf, Config.ns, hl_bg, lnum, math.max(start - 1, 0), finish + 1)
         elseif hl.keyword == "wide_fg" then
-          add_highlight(buf, Config.ns, hl_fg, lnum, keyword_start, finish + 1)
+          add_highlight(buf, Config.ns, hl_fg, lnum, math.max(start - 1, 0), finish + 1)
         elseif hl.keyword == "bg" then
-          add_highlight(buf, Config.ns, hl_bg, lnum, keyword_start, finish)
+          add_highlight(buf, Config.ns, hl_bg, lnum, start, finish)
         elseif hl.keyword == "fg" then
-          add_highlight(buf, Config.ns, hl_fg, lnum, keyword_start, finish)
+          add_highlight(buf, Config.ns, hl_fg, lnum, start, finish)
         end
       end
 
