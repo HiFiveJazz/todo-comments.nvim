@@ -204,19 +204,35 @@ function M.highlight(buf, first, last, _event)
 
     local is_multiline = false
 
-    if not kw and last_match and Config.options.highlight.multiline then
-      if
-        M.is_comment(buf, lnum, last_match.start)
-        and line:find(Config.options.highlight.multiline_pattern, last_match.start)
-      then
-        kw = last_match.kw
-        start = last_match.start
-        finish = start
-        is_multiline = true
-      else
-        last_match = nil
-      end
+    -- if not kw and last_match and Config.options.highlight.multiline then
+    --   if
+    --     M.is_comment(buf, lnum, last_match.start)
+    --     and line:find(Config.options.highlight.multiline_pattern, last_match.start)
+    --   then
+    --     kw = last_match.kw
+    --     start = last_match.start
+    --     finish = start
+    --     is_multiline = true
+    --   else
+    --     last_match = nil
+    --   end
+    -- end
+  if not kw and last_match and Config.options.highlight.multiline then
+    local comment_start = line:find("^%s*%-%-")
+
+    if
+      comment_start
+      and M.is_comment(buf, lnum, comment_start - 1)
+      and line:find(Config.options.highlight.multiline_pattern, 1)
+    then
+      kw = last_match.kw
+      start = comment_start
+      finish = #line + 1
+      is_multiline = true
+    else
+      last_match = nil
     end
+  end
 
     if kw then
       kw = Config.keywords[kw] or kw
