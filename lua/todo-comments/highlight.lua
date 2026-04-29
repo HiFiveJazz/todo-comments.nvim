@@ -279,8 +279,9 @@ end
           add_highlight(buf, Config.ns, hl_bg, lnum, 0, start)
         end
 
-        local comment_start = line_comment_range(buf, line)
-        local keyword_start = comment_start and comment_start - 1 or start
+        local _, comment_end = line_comment_range(buf, line)
+        local comment_prefix_start = line:find("%S") -- first non-whitespace char
+        local keyword_start = comment_prefix_start and comment_prefix_start - 1 or start
 
         -- tag highlights
         if hl.keyword == "wide" or hl.keyword == "wide_bg" then
